@@ -1,7 +1,6 @@
 <!doctype html>
 <html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js" data-theme-init>
   <head>
-	<meta name="generator" content="Hugo 0.165.0">
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -32,21 +31,17 @@
 </script>
 <meta name="robots" content="index, follow">
 
-<title>Bazel Agent</title>
-<meta name="description" content="Bazel runner for repository agents">
-<meta property="og:url" content="/">
+<title>404 Page not found | Bazel Agent</title>
+<meta name="description" content="">
+<meta property="og:url" content="/404.html">
 	<meta property="og:site_name" content="Bazel Agent">
-	<meta property="og:title" content="Bazel agent">
-	<meta property="og:description" content="Bazel runner for repository agents">
+	<meta property="og:title" content="404 Page not found">
 	<meta property="og:locale" content="en">
 	<meta property="og:type" content="website">
 
-	<meta itemprop="name" content="Bazel agent">
-	<meta itemprop="description" content="Bazel runner for repository agents">
-	<meta itemprop="wordCount" content="511">
+	<meta itemprop="name" content="404 Page not found">
 	<meta name="twitter:card" content="summary">
-	<meta name="twitter:title" content="Bazel agent">
-	<meta name="twitter:description" content="Bazel runner for repository agents">
+	<meta name="twitter:title" content="404 Page not found">
 <link rel="preload" href="/scss/main.min.8f0680d136cc9695b0ad0e99d08675b9835bbc1b0b99eda42af2f5baac89c013.css" as="style" integrity="sha256-jwaA0TbMlpWwrQ6Z0IZ1uYNbvBsLme2kKvL1uqyJwBM=" crossorigin="anonymous">
 <link href="/scss/main.min.8f0680d136cc9695b0ad0e99d08675b9835bbc1b0b99eda42af2f5baac89c013.css" rel="stylesheet" integrity="sha256-jwaA0TbMlpWwrQ6Z0IZ1uYNbvBsLme2kKvL1uqyJwBM=" crossorigin="anonymous">
 <script
@@ -55,7 +50,7 @@
   crossorigin="anonymous"></script>
 
   </head>
-  <body class="td-home">
+  <body class="td-404">
     <header>
       <nav class="td-navbar js-navbar-scroll">
 <div class="td-navbar-container container-fluid flex-column flex-md-row">
@@ -132,77 +127,10 @@
     </header>
     <div class="container-fluid td-default td-outer">
       <main role="main" class="td-main">
-        
-<section class="row">
-  <div class="col">
-    <div class="container td-content landing-content">
-      <h1>Bazel agent</h1>
-      
-      <p class="lead">Bazel runner for repository agents</p>
-       
-      <p class="text-body-secondary">Built with go, sh.</p>
-       <p><code>bazel_agent</code> is the repository Bazel entry point for agents. It keeps the
-Bazel invocation behind a validated subcommand while consistently applying the
-agent configuration:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>bazel_agent bazel test //path/to/package:all
-</span></span><span style="display:flex;"><span>    -&gt;
-</span></span><span style="display:flex;"><span>bazel test --config=agent //path/to/package:all
-</span></span></code></pre></div><p><code>bazel</code> is the only Bazel entry point, and it is a validated subcommand. The
-runner accepts a known Bazel command after the <code>bazel</code> keyword, rejects
-arbitrary leading arguments, and places <code>--config=agent</code> after the command.
-Targets, command options, and arguments after the <code>--</code> separator of a
-<code>bazel run</code> invocation pass through unchanged. Later options therefore retain
-Bazel&rsquo;s normal precedence and can override settings supplied by the agent
-configuration. The runner resolves <code>bazel</code> from <code>PATH</code> and replaces itself
-with that process, so signals and the final exit status are not mediated by
-another wrapper process. Uses of the persistent Bazel server follow the host
-Codex network policy; the <code>host-bot</code> profile allows loopback so the
-client-server connection is not blocked.</p>
-<p>The runner does not create or inject a host temporary directory. Bazel actions
-use declared outputs and Bazel-managed temporary storage, and tests use their
-test temporary-directory contract. Repository-updating host tools that need
-scratch must accept or derive an explicit task/run path under <code>out/&lt;task&gt;/</code>
-instead of relying on ambient <code>TMPDIR</code>, <code>TMP</code>, or <code>TEMP</code> values propagated to
-the whole build.</p>
-<h2 id="cached-repository-tools">Cached repository tools</h2>
-<p>Frequently used repository control tools can bypass Bazel analysis after one
-exact build:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>bazel_agent tool run repo_delivery -- provider
-</span></span><span style="display:flex;"><span>bazel_agent tool warm mcp_cordis repo_delivery
-</span></span><span style="display:flex;"><span>bazel_agent tool path repo_delivery
-</span></span></code></pre></div><p>The runner hashes its own binary plus each tool&rsquo;s declared source, dependency
-locks, Bazel pins, repository rc files, optional user and host rc files, their
-transitive imports, any <code>BAZELRC</code> environment files, and the platform. A cache
-miss takes an exclusive per-key lock, builds the target with runfiles enabled,
-and copies the complete runnable output into an atomically installed entry. A
-hit executes that entry directly without starting a Bazel client or loading a
-worktree graph. Concurrent misses for the same exact key share one build.
-Inputs are hashed again under the lock and after the build; an in-flight source
-change selects a new key instead of publishing stale output under the old one.</p>
-<p><code>BAZEL_AGENT_TOOL_CACHE</code> or <code>--cache-root</code> can select the cache. The default is
-<code>/var/cache/bazel/tool_cache</code> when that managed directory exists, otherwise
-the user&rsquo;s cache directory. Because entries contain executable code, the cache
-root must not be writable by group or others. Source changes select a new key,
-so a dirty relevant source file cannot silently reuse an older executable.</p>
-<p><code>bazel_agent doctor --workspace-root PATH --task-scratch out/&lt;task&gt;/&lt;run&gt;</code> is
-a read-only, bounded JSON diagnostic. It reports runner and built-source
-identity, Bazelisk pins, platform, rc/profile composition, task scratch
-classification, and stale host-install state without dumping the environment.</p>
-<h2 id="installation">Installation</h2>
-<p>Bootstrap the host installation with the underlying Bazel command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>bazel run --config<span style="color:#f92672">=</span>agent //projects/bazel_agent:install
-</span></span></code></pre></div><p>Once installed, update it with:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>bazel_agent bazel run //projects/bazel_agent:install
-</span></span></code></pre></div><p>The install target atomically replaces <code>~/.local/bin/bazel_agent</code>. After every
-code update to this project, rerun the install target; the installed binary is
-not updated automatically. Repository launchers probe the installed runner&rsquo;s
-tool-cache support before using it, so an older host installation retains its
-documented Bazel fallback during rollout.</p>
-
-    </div>
-  </div>
-</section>
-
+        <div class="td-content">
+  <h1>Not found</h1>
+  <p>Oops! This page doesn't exist. Try going back to the <a href="/">home page</a>.</p>
+</div>
       </main>
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">
